@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tasarım Kalıpları Atölyesi</title>
+  <meta name="description" content="Yazılım tasarım kalıplarını animasyonlar ve Java örnekleriyle anlatan interaktif ders materyali.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='26' height='26' rx='6' fill='%234f46e5'/%3E%3Crect x='34' y='4' width='26' height='26' rx='6' fill='%2310b981'/%3E%3Crect x='4' y='34' width='26' height='26' rx='6' fill='%23f59e0b'/%3E%3Crect x='34' y='34' width='26' height='26' rx='13' fill='%23e11d48'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Tema ve yakınlaştırma ilk boyamadan önce uygulanır (ekran yanıp sönmesin diye).
+    (function () {
+      var root = document.documentElement, theme = null, scale = null;
+      try {
+        theme = JSON.parse(localStorage.getItem('dp.theme'));
+        scale = JSON.parse(localStorage.getItem('dp.scale'));
+      } catch (e) { /* depolama kapalı olabilir */ }
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', theme);
+      if (typeof scale === 'number') root.style.setProperty('--scale', scale);
+    })();
+  </script>
+</head>
+<body>
+  <div id="app" class="app"></div>
+  <noscript><p style="padding:2rem">Bu uygulama JavaScript gerektirir.</p></noscript>
+
+  <!-- Çekirdek -->
+  <script src="js/core/dp.js"></script>
+  <script src="js/core/java-highlight.js"></script>
+  <script src="js/core/code-view.js"></script>
+  <script src="js/core/stepper.js"></script>
+  <script src="js/core/class-diagram.js"></script>
+  <script src="js/core/sequence-diagram.js"></script>
+  <script src="js/core/memory-view.js"></script>
+  <script src="js/core/quiz.js"></script>
+  <script src="js/core/fx.js"></script>
+  <script src="js/core/kit.js"></script>
+
+  <!-- Kalıp kataloğu ve ortak lojistik dünyası -->
+  <script src="js/catalog.js"></script>
+  <script src="js/shared/lojistik.js"></script>
+
+  <!-- Factory Method -->
+  <script src="js/patterns/factory-method/data.js"></script>
+  <script src="js/patterns/factory-method/stage.js"></script>
+  <script src="js/patterns/factory-method/scenes-1.js"></script>
+  <script src="js/patterns/factory-method/scenes-2.js"></script>
+  <script src="js/patterns/factory-method/scenes-3.js"></script>
+
+  <!-- Abstract Factory -->
+  <script src="js/patterns/abstract-factory/data.js"></script>
+  <script src="js/patterns/abstract-factory/matrix.js"></script>
+  <script src="js/patterns/abstract-factory/stage.js"></script>
+  <script src="js/patterns/abstract-factory/scenes-1.js"></script>
+  <script src="js/patterns/abstract-factory/scenes-2.js"></script>
+  <script src="js/patterns/abstract-factory/scenes-3.js"></script>
+
+  <!-- Singleton -->
+  <script src="js/patterns/singleton/data.js"></script>
+  <script src="js/patterns/singleton/memory.js"></script>
+  <script src="js/patterns/singleton/stage.js"></script>
+  <script src="js/patterns/singleton/scenes-1.js"></script>
+  <script src="js/patterns/singleton/scenes-2.js"></script>
+  <script src="js/patterns/singleton/scenes-3.js"></script>
+
+  <!-- Builder -->
+  <script src="js/patterns/builder/data.js"></script>
+  <script src="js/patterns/builder/stage.js"></script>
+  <script src="js/patterns/builder/director.js"></script>
+  <script src="js/patterns/builder/scenes-1.js"></script>
+  <script src="js/patterns/builder/scenes-2.js"></script>
+  <script src="js/patterns/builder/scenes-3.js"></script>
+
+  <!-- Prototype -->
+  <script src="js/patterns/prototype/data.js"></script>
+  <script src="js/patterns/prototype/stage.js"></script>
+  <script src="js/patterns/prototype/scenes-1.js"></script>
+  <script src="js/patterns/prototype/scenes-2.js"></script>
+  <script src="js/patterns/prototype/scenes-3.js"></script>
+
+  <!-- Adapter -->
+  <script src="js/patterns/adapter/data.js"></script>
+  <script src="js/patterns/adapter/stage.js"></script>
+  <script src="js/patterns/adapter/scenes-1.js"></script>
+  <script src="js/patterns/adapter/scenes-2.js"></script>
+  <script src="js/patterns/adapter/scenes-3.js"></script>
+
+  <!-- Uygulama kabuğu (en son) -->
+  <script src="js/app.js"></script>
+</body>
+</html>

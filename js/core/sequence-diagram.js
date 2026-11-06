@@ -86,6 +86,8 @@
           const d0 = topDepth(m.from);
           const a = push(m.to, yy + SELF_DROP - 6);
           m._g = { x0: edgeX(m.from, d0, 'right'), x1: edgeX(m.to, a.depth, 'right'), y: yy };
+          // short: kendine kısa çağrı — aktivasyon hemen kapanır
+          if (m.short) pop(m.to, yy + SELF_DROP + 14);
         } else if (m.kind === 'call') {
           const d0 = topDepth(m.from);
           const a = push(m.to, yy - 6);

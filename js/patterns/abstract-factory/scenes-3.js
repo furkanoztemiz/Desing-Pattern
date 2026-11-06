@@ -450,7 +450,7 @@ public class JdbcAilesi {
       title: 'Diğer yaratımsal kalıplarla farkı',
       intro: 'Abstract Factory, birbirine uyan **hazır bir aileyi** tek seferde verir. Benzer amaçlı kalıplarla karıştırmamak için:',
       extraHtml: `<table class="cmp cmp-3">
-        <thead><tr><th></th><th>Abstract Factory</th><th>Builder</th><th>Prototype</th></tr></thead>
+        <thead lang="en"><tr><th></th><th>Abstract Factory</th><th>Builder</th><th>Prototype</th></tr></thead>
         <tbody>
           <tr><td>Ne üretir?</td><td>İlişkili ürün <b>ailesi</b></td><td>Tek, karmaşık bir ürün</td><td>Var olan nesnenin kopyası</td></tr>
           <tr><td>Nasıl?</td><td>Her ürün türü için bir metot</td><td>Adım adım kurulum, sonda <code>build()</code></td><td><code>clone()</code> / kopya kurucu</td></tr>
@@ -490,7 +490,7 @@ TasimaBelgesi belge = fabrika.belgeOlustur();   // Konşimento`,
     {
       type: 'mcq',
       q: 'Abstract Factory kalıbının **temel amacı** nedir?',
-      options: ['Bir sınıfın yalnızca tek örneği olmasını sağlamak', 'Birbiriyle ilişkili nesne **ailelerini**, somut sınıflarını belirtmeden oluşturmak', 'Karmaşık bir nesneyi adım adım kurmak', 'Var olan bir nesneyi kopyalayarak yenisini üretmek'],
+      options: ['Bir sınıfın yalnızca tek örneği olmasını ve ona genel bir erişim noktasını sağlamak', 'Birbiriyle ilişkili nesne ailelerini, somut sınıflarını belirtmeden oluşturmak', 'Karmaşık bir nesneyi adım adım kurup aynı süreçle farklı temsiller üretmek', 'Var olan bir örneği kopyalayarak, türünü belirtmeden yeni nesneler üretmek'],
       answer: 1,
       explain: 'GoF: “İlişkili ya da bağımlı nesne ailelerini, somut sınıflarını belirtmeden oluşturmak için bir arayüz sağla.” Diğerleri Singleton, Builder ve Prototype’ın amaçlarıdır.',
     },
@@ -505,42 +505,42 @@ TasimaBelgesi belge = fabrika.belgeOlustur();   // Konşimento`,
     {
       type: 'mcq',
       q: 'Kalıpsız sürüm 2.0’daki **Uçak + CMR** hatasını Abstract Factory nasıl önler?',
-      options: ['Derleyici string karşılaştırmalarını denetler', 'Gümrük kontrolünü tamamen kaldırır', 'Araç ve belge **aynı somut fabrikadan** geldiği için aileler karışamaz', 'Tüm belgeleri tek bir sınıfta toplar'],
+      options: ['Derleyici, switch’lerdeki string karşılaştırmalarını birbiriyle denetler', 'Gümrük kontrolünü kaldırır; belge türü artık hiçbir yerde sorulmaz', 'Araç ve belge aynı somut fabrikadan geldiği için aileler karışamaz', 'Bütün belge türlerini tek bir sınıfta toplayıp karışmayı engeller'],
       answer: 2,
       explain: 'İstemci aracı da belgeyi de **aynı** fabrika nesnesinden ister. [[HavaFabrikasi]] yalnızca Uçak ve AWB üretebilir; yanlış eşleşme yapısal olarak imkânsızdır.',
     },
     {
       type: 'mcq',
       q: 'Sisteme yeni bir **aile** (ör. Demiryolu: Tren + demiryolu belgesi) eklemek için ne gerekir?',
-      options: ['Yeni bir somut fabrika ve o ailenin somut ürünlerini yazmak; mevcut kod değişmez', '[[LojistikFabrikasi]] arayüzüne yeni bir metot eklemek', '[[TeslimatServisi]] içine yeni bir switch dalı eklemek', 'Tüm somut fabrikaları değiştirmek'],
+      options: ['Yeni bir somut fabrika ve o ailenin somut ürünlerini yazmak; mevcut kod değişmez', '[[LojistikFabrikasi]] arayüzüne yeni aile için ayrı bir oluşturma metodu eklemek', '[[TeslimatServisi]] içine Demiryolu için yeni bir switch dalı eklemek', 'Var olan bütün somut fabrikalara Tren üreten bir metot eklemek'],
       answer: 0,
       explain: 'Aile eklemek matrise yeni bir **satır** eklemektir: yeni sınıflar yazılır, eskiler değişmez (OCP).',
     },
     {
       type: 'mcq',
       q: 'Yeni bir **ürün türü** (ör. sigorta poliçesi) eklemek neden zordur?',
-      options: ['Java arayüzleri genişletilemez', 'İstemci kodu silinmek zorundadır', 'Ürün türü sayısı ikiyi geçemez', 'Soyut fabrika arayüzü değişir; bu yüzden **tüm somut fabrikalar** değişmek zorundadır'],
+      options: ['Java arayüzlerine sonradan yeni bir metot eklemek mümkün değildir', 'İstemci kodunun baştan yazılması ve bütün fabrikaların silinmesi gerekir', 'Kalıp, bir ailede en fazla iki ürün türüne izin verecek biçimde tanımlıdır', 'Soyut fabrika arayüzü değişir; bu yüzden tüm somut fabrikalar değişmek zorundadır'],
       answer: 3,
       explain: 'Ürün türü eklemek matrise yeni bir **sütun** eklemektir: arayüze yeni metot gelir ve onu gerçeklemeyen her fabrika derlenmez. (Java 8 `default` metotları acıyı hafifletebilir.)',
     },
     {
       type: 'mcq',
       q: 'Factory Method ile Abstract Factory arasındaki **mekanizma** farkı nedir?',
-      options: ['FM kompozisyon, AF kalıtım kullanır', 'İkisi de yalnızca statik metot kullanır', 'FM **kalıtımla** (alt sınıf override eder), AF **kompozisyonla** (istemciye fabrika nesnesi verilir) çalışır', 'AF yalnızca tek ürün üretir'],
+      options: ['FM kompozisyonla (fabrika nesnesi verilir), AF kalıtımla (alt sınıf override eder) çalışır', 'İkisi de statik metotlarla çalışır; fark yalnızca ürettikleri ürün sayısındadır', 'FM kalıtımla (alt sınıf override eder), AF kompozisyonla (istemciye fabrika nesnesi verilir) çalışır', 'AF tek bir ürün, FM ise birbiriyle ilişkili bir ürün ailesi üretir'],
       answer: 2,
       explain: 'Factory Method’da kararı alt sınıf verir; Abstract Factory’de istemcinin alanında tuttuğu fabrika nesnesi.',
     },
     {
       type: 'mcq',
       q: '[[TeslimatServisi]], fabrikayı kurucu (constructor) parametresi olarak alıyor. Bunun **en önemli kazancı** nedir?',
-      options: ['Fabrika **dışarıdan değiştirilebilir**; testte sahte bir aile verilebilir', 'Program daha hızlı çalışır', '[[TeslimatServisi]] için alt sınıf yazmak zorunlu olur', 'Somut ürünlere doğrudan erişilir'],
+      options: ['Fabrika dışarıdan değiştirilebilir; testte sahte bir aile verilebilir', 'Program daha hızlı çalışır', '[[TeslimatServisi]] için alt sınıf yazmak zorunlu olur', 'Somut ürünlere doğrudan erişilir'],
       answer: 0,
       explain: 'Bağımlılık enjeksiyonu: istemci kendi bağımlılığını üretmez, alır. Bu sayede aile çalışma zamanında ya da testte değiştirilebilir.',
     },
     {
       type: 'mcq',
       q: 'Swing’de `UIManager.setLookAndFeel(...)` çağrısı Abstract Factory açısından neye karşılık gelir?',
-      options: ['Somut bir ürün oluşturmaya', 'Soyut bir ürün tanımlamaya', 'İstemciyi değiştirmeye', '**Somut fabrikayı** (bileşen ailesini) seçmeye'],
+      options: ['Somut bir ürünü (tek bir düğmeyi) oluşturmaya', 'Soyut bir ürünü (bileşen arayüzünü) tanımlamaya', 'İstemciyi (uygulama kodunu) değiştirmeye', 'Somut fabrikayı (bileşen ailesini) seçmeye'],
       answer: 3,
       explain: 'Look-and-Feel seçmek, bütün UI bileşenlerinin ailesini (Metal, Nimbus, Windows…) tek seferde değiştirir: tıpkı `new KaraFabrikasi()` gibi.',
     },

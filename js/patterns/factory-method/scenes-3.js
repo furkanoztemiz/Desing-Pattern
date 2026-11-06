@@ -333,7 +333,7 @@ class AracFabrikasi {
     {
       type: 'mcq',
       q: 'Factory Method kalıbında hangi nesnenin oluşturulacağına **kim** karar verir?',
-      options: ['İstemci ([[Main]])', 'Yaratıcı ([[Lojistik]])', 'Somut yaratıcı alt sınıflar ([[KaraLojistigi]], [[DenizLojistigi]])', 'Ürün arayüzü ([[TasimaAraci]])'],
+      options: ['İstemci, yani ürünü kullanan kod ([[Main]])', 'Soyut yaratıcı sınıfın kendisi ([[Lojistik]])', 'Somut yaratıcı alt sınıflar ([[KaraLojistigi]] gibi)', 'Ürün arayüzü ve onun varsayılan metotları ([[TasimaAraci]])'],
       answer: 2,
       explain: 'Yaratıcı, fabrika metodunu soyut bırakır; somut alt sınıflar onu override ederek hangi ürünün üretileceğini belirler. GoF: “hangi sınıfın örnekleneceğine **alt sınıflar** karar versin.”',
     },
@@ -348,7 +348,7 @@ class AracFabrikasi {
     {
       type: 'mcq',
       q: '`teslimatPlanla()` içindeki `arac` değişkeninin **derleme zamanındaki (statik) tipi** nedir?',
-      options: ['[[Kamyon]]', '[[TasimaAraci]]', '[[KaraLojistigi]]', '`Object`'],
+      options: ['[[Kamyon]]', '[[TasimaAraci]]', '[[KaraLojistigi]]', 'Object'],
       answer: 1,
       explain: 'Değişken `TasimaAraci` olarak bildirildi. Çalışma zamanında nesne bir Kamyon olabilir ama Lojistik bunu bilmez; bu sayede somut sınıflara bağımlı olmaz.',
     },
@@ -362,7 +362,7 @@ class AracFabrikasi {
     {
       type: 'mcq',
       q: 'Aşağıdakilerden hangisi Factory Method’un bir **dezavantajıdır**?',
-      options: ['İstemci somut ürün sınıflarına bağımlı hâle gelir', 'Her yeni ürün için yeni bir yaratıcı alt sınıfı gerekebilir; sınıf sayısı artar', 'Ürünler ortak bir arayüze sahip olamaz', 'Çalışma zamanında polimorfizm kullanılamaz'],
+      options: ['İstemci somut ürün sınıflarına bağımlı hâle gelir; new satırları dağılır', 'Her yeni ürün için yeni bir yaratıcı alt sınıfı gerekebilir; sınıf sayısı artar', 'Ürünler ortak bir arayüze sahip olamaz; her biri ayrı ayrı kullanılır', 'Çalışma zamanında polimorfizm kullanılamaz; ürün derlemede sabitlenir'],
       answer: 1,
       explain: 'Paralel sınıf hiyerarşileri büyür. Tek bir ürün türü olan basit senaryolarda bu ek karmaşıklık gereksiz olabilir.',
     },
@@ -376,7 +376,7 @@ class AracFabrikasi {
     {
       type: 'mcq',
       q: '`Calendar.getInstance()` için hangisi doğrudur?',
-      options: ['GoF Factory Method’un klasik örneğidir', 'Statik fabrika metodudur; alt sınıfların override etmesine dayanmaz', 'Abstract Factory kalıbıdır', 'Singleton’dır; hep aynı nesneyi döndürür'],
+      options: ['GoF Factory Method’un klasik örneğidir; alt sınıflar onu override eder', 'Statik fabrika metodudur; alt sınıfların override etmesine dayanmaz', 'Abstract Factory kalıbıdır; ilişkili takvim nesnelerini birlikte üretir', 'Singleton’dır; her çağrıda aynı Calendar nesnesini döndürür'],
       answer: 1,
       explain: 'Statik metotlar override edilemez. `getInstance()` yararlı bir *statik fabrika metodu* deyimidir ama kalıtıma dayanan GoF Factory Method değildir. Her çağrıda yeni bir nesne döner.',
     },
@@ -384,10 +384,10 @@ class AracFabrikasi {
       type: 'mcq',
       q: 'Factory Method ile Abstract Factory arasındaki **temel fark** hangisidir?',
       options: [
-        'Factory Method kalıtımla **tek bir ürün** üretir; Abstract Factory nesne kompozisyonuyla **ilişkili ürün aileleri** üretir',
-        'Factory Method yalnızca statik metotlarla çalışır',
-        'Abstract Factory arayüz kullanmaz',
-        'İkisi aynı kalıbın farklı adlarıdır',
+        'FM kalıtımla tek bir ürün üretir; AF kompozisyonla ilişkili ürün aileleri üretir',
+        'FM yalnızca statik metotlarla çalışır; AF ise her zaman bir Singleton’dır',
+        'AF arayüz kullanmaz; somut fabrikalar doğrudan istemciye yazılır',
+        'İkisi aynı kalıbın farklı adlarıdır; GoF ikisini örnek için ayırmıştır',
       ],
       answer: 0,
       explain: 'Abstract Factory’nin içindeki her “oluştur” metodu çoğu zaman bir fabrika metodudur; fark, ürün ailesi ve kompozisyondur.',

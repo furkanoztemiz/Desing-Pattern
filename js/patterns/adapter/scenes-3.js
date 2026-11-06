@@ -347,7 +347,7 @@
       title: 'Adapter, Decorator, Proxy, Facade, Bridge',
       intro: 'Yapısal kalıpların çoğu bir nesneyi “sarar”. Ayırt etmenin anahtarı: **arayüz değişiyor mu** ve kalıp **ne zaman** uygulanıyor?',
       extraHtml: `<table class="cmp cmp-3">
-        <thead><tr><th></th><th>Adapter</th><th>Decorator</th><th>Proxy</th><th>Facade</th><th>Bridge</th></tr></thead>
+        <thead lang="en"><tr><th></th><th>Adapter</th><th>Decorator</th><th>Proxy</th><th>Facade</th><th>Bridge</th></tr></thead>
         <tbody>
           <tr><td>Arayüz</td><td><b>Değiştirir</b></td><td>Aynı kalır</td><td>Aynı kalır</td><td>Yeni, sade arayüz</td><td>Ayrı hiyerarşiler</td></tr>
           <tr><td>Amaç</td><td>Uyumsuzu uydurmak</td><td>Davranış eklemek</td><td>Erişimi denetlemek</td><td>Alt sistemi sadeleştirmek</td><td>Soyutlama ↔ gerçekleştirim</td></tr>
@@ -392,14 +392,14 @@ Reader okuyucu = new BufferedReader(new InputStreamReader(System.in));
     {
       type: 'mcq',
       q: 'Adapter kalıbının **temel amacı** (GoF) nedir?',
-      options: ['Bir nesneye çalışma anında yeni sorumluluklar eklemek', 'Bir sınıfın arayüzünü, istemcilerin **beklediği başka bir arayüze dönüştürmek**', 'Karmaşık bir alt sisteme tek bir giriş noktası sunmak', 'Bir nesneye erişimi denetlemek'],
+      options: ['Bir nesneye, alt sınıf yazmadan, çalışma anında yeni sorumluluklar eklemek', 'Bir sınıfın arayüzünü, istemcilerin beklediği başka bir arayüze dönüştürmek', 'Karmaşık bir alt sistemin önüne sade, tek bir giriş noktası (arayüz) koymak', 'Bir nesneye erişimi, onun yerine geçen bir vekil nesneyle denetlemek'],
       answer: 1,
       explain: 'GoF: “Bir sınıfın arayüzünü istemcilerin beklediği başka bir arayüze dönüştür.” Diğerleri Decorator, Facade ve Proxy’nin amaçlarıdır.',
     },
     {
       type: 'mcq',
       q: 'Neden `GlobalShipApi` sınıfına `implements KargoFirmasi` ekleyip sorunu orada çözmedik?',
-      options: ['Java buna izin vermez', 'Arayüzler yalnızca yeni sınıflara eklenebilir', 'Üçüncü parti bir kütüphane: kaynak kodu elimizde değil, değiştirsek de her sürümde kaybolur', 'Daha yavaş çalışırdı'],
+      options: ['Java, bir sınıfın sonradan yeni bir arayüz uygulamasına izin vermez', 'Arayüzler yalnızca yeni yazılan sınıflara eklenebilir; eski sınıflar uygulayamaz', 'Üçüncü parti bir kütüphane: kaynak kodu elimizde değil, değişiklik her sürümde kaybolur', 'Arayüz çağrıları doğrudan çağrılardan yavaştır; adaptör daha hızlı çalışır'],
       answer: 2,
       explain: 'Uyarlanan genellikle **değiştiremediğimiz** bir sınıftır (.jar, başka ekibin kodu, eski sistem). Adaptör iki tarafa da dokunmadan aralarına girer.',
     },
@@ -414,21 +414,21 @@ Reader okuyucu = new BufferedReader(new InputStreamReader(System.in));
     {
       type: 'mcq',
       q: 'İade servisindeki `new ShipmentRequest(musteriSehri, depoSehri, kg)` hatasını derleyici neden **yakalamadı**?',
-      options: ['Derleyici uyarı verdi ama görmezden gelindi', '`int` değer `double` parametreye **kendiliğinden genişler**; tipler uyumlu olduğu için kod geçerlidir', '`ShipmentRequest` bir record olduğu için', 'Java birimleri denetlemez ama yalnızca çalışma anında hata verir'],
+      options: ['Derleyici bir uyarı verdi ama uyarı derleme sırasında görmezden gelindi', 'int değer double parametreye kendiliğinden genişler; tipler uyumlu olduğu için kod geçerlidir', 'ShipmentRequest bir record olduğu için kurucu parametreleri denetlenmez', 'Java birimleri denetlemez; bu tür hatalar yalnızca çalışma anında istisna fırlatır'],
       answer: 1,
       explain: 'Genişletici dönüşüm (int → double) sessizdir. Derleyici “12” sayısının kilogram mı pound mu olduğunu bilemez; birim bilgisi tipte yok. Bu yüzden çeviriyi tek bir yerde (adaptörde) toplamak hayatidir.',
     },
     {
       type: 'mcq',
       q: '**Nesne adaptörü** için hangisi doğrudur?',
-      options: ['Uyarlanandan kalıtır', 'Uyarlananı bir alanda tutar (kompozisyon); uyarlananın alt sınıflarını da sarabilir', 'Uyarlanan `final` ise yazılamaz', 'Uyarlananın bütün public metotlarını dışarı açar'],
+      options: ['Uyarlanandan kalıtır (extends); böylece onun bütün metotlarını devralır', 'Uyarlananı bir alanda tutar (kompozisyon); uyarlananın alt sınıflarını da sarabilir', 'Uyarlanan sınıf final ise yazılamaz; çünkü ondan kalıtması gerekir', 'Uyarlananın bütün public metotlarını istemciye olduğu gibi dışarı açar'],
       answer: 1,
       explain: 'Nesne adaptörü “sahiptir” ilişkisi kurar: `private final GlobalShipApi api`. Diğer şıklar **sınıf adaptörünün** özellikleridir.',
     },
     {
       type: 'mcq',
       q: '`GlobalShipApi` sınıfı `final` olsaydı ne olurdu?',
-      options: ['İki adaptör biçimi de yazılamazdı', 'Yalnızca nesne adaptörü yazılamazdı', 'Sınıf adaptörü **derlenmezdi** (`cannot inherit from final`); nesne adaptörü sorunsuz çalışırdı', 'Hiçbir şey değişmezdi'],
+      options: ['İki adaptör biçimi de derlenmezdi; final sınıflar hiçbir biçimde uyarlanamaz', 'Nesne adaptörü derlenmezdi; sınıf adaptörü ise kalıtımla sorunsuz çalışırdı', 'Sınıf adaptörü derlenmezdi (cannot inherit from final); nesne adaptörü sorunsuz çalışırdı', 'Hiçbir şey değişmezdi; final yalnızca alanların değiştirilmesini engeller'],
       answer: 2,
       explain: 'Sınıf adaptörü uyarlanandan kalıtmak zorundadır; `final` sınıftan kalıtılamaz. Nesne adaptörü kalıtım kullanmadığı için etkilenmez.',
     },
@@ -443,7 +443,7 @@ Reader okuyucu = new BufferedReader(new InputStreamReader(System.in));
     {
       type: 'mcq',
       q: 'Adapter ile **Decorator** arasındaki temel fark nedir?',
-      options: ['Adapter arayüzü **değiştirir**; Decorator arayüzü **aynı tutar** ve davranış ekler', 'İkisi de arayüzü değiştirir', 'Decorator yalnızca kalıtımla yazılır', 'Adapter yalnızca tek bir metot için kullanılır'],
+      options: ['Adapter arayüzü değiştirir; Decorator arayüzü aynı tutar ve davranış ekler', 'İkisi de arayüzü değiştirir; fark yalnızca kaç nesne sardıklarındadır', 'Decorator yalnızca kalıtımla, Adapter yalnızca kompozisyonla yazılabilir', 'Adapter tek bir metodu uyarlar; Decorator ise bütün arayüzü yeniden tanımlar'],
       answer: 0,
       explain: '`new BufferedReader(new InputStreamReader(System.in))`: içteki adaptör arayüzü (bayt → karakter) değiştirir; dıştaki dekoratör yine bir `Reader`’dır, yalnızca tamponlama ekler.',
     },

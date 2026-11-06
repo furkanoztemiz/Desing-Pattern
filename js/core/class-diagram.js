@@ -1,6 +1,6 @@
 /*
  * ClassDiagram — SVG tabanlı UML sınıf diyagramı.
- * - Kalıtım (generalization), gerçekleme (realization), bağımlılık, «create» ilişkileri
+ * - Kalıtım (generalization), gerçekleme (realization), bağımlılık, «create», toplama (aggregation ◇) ilişkileri
  * - Rol etiketleri ve rol renkleri
  * - "Genel (GoF)" ↔ "Somut örnek" adlandırma geçişi
  * - Vurgulama, rozetler, ilişki üzerinde ilerleyen "yürütme jetonu" animasyonu
@@ -222,17 +222,18 @@
         return;
       }
 
-      if (role) {
+      // noTag: aynı roldeki sıkışık kutuların yalnızca birinde etiket (Facade'ın alt sistem sütunu)
+      if (role && !c.noTag) {
         const label = `${role.en} · ${role.tr}`;
-        const tw = Math.ceil(label.length * 6.9 + 18);
-        g.appendChild(
-          s(
-            'g',
-            { class: 'uml-tag', transform: 'translate(0,-25)' },
-            s('rect', { width: tw, height: 20, rx: 10 }),
-            s('text', { x: 9, y: 14 }, label)
-          )
-        );
+        const natural = Math.ceil(label.length * 6.9 + 18);
+        // Etiket sınıf kutusundan geniş olmasın: yan yana duran sınıfların etiketleri üst üste binmesin.
+        const tw = Math.min(natural, w);
+        const tt = s('text', { x: 9, y: 14 }, label);
+        if (natural > w) {
+          tt.setAttribute('textLength', String(w - 18));
+          tt.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+        }
+        g.appendChild(s('g', { class: 'uml-tag', transform: 'translate(0,-25)' }, s('rect', { width: tw, height: 20, rx: 10 }), tt));
       }
 
       g.appendChild(s('rect', { class: 'uml-box', width: w, height: hgt, rx: RADIUS }));
@@ -309,7 +310,8 @@
       const type = r.type || 'dependency';
       const triangle = type === 'generalization' || type === 'realization';
       const nesting = type === 'nesting'; // iç sınıf: dış sınıf ucunda ⊕
-      const dashed = type !== 'generalization' && type !== 'association' && !nesting;
+      const aggregation = type === 'aggregation'; // bütün ucunda boş baklava (◇), parça ucunda açık ok
+      const dashed = type !== 'generalization' && type !== 'association' && !nesting && !aggregation;
       const end = pts[pts.length - 1];
       const prev = pts[pts.length - 2];
       const len = dist(prev, end) || 1;
@@ -343,8 +345,23 @@
           points: `${bx + nrm.x * 6.5},${by + nrm.y * 6.5} ${end.x},${end.y} ${bx - nrm.x * 6.5},${by - nrm.y * 6.5}`,
         });
       }
+      let diamond = null;
+      if (aggregation) {
+        const a0 = pts[0];
+        const a1 = pts[1];
+        const l0 = dist(a0, a1) || 1;
+        const d0 = { x: (a1.x - a0.x) / l0, y: (a1.y - a0.y) / l0 };
+        const n0 = { x: -d0.y, y: d0.x };
+        const mid = { x: a0.x + d0.x * 11, y: a0.y + d0.y * 11 };
+        const back = { x: a0.x + d0.x * 22, y: a0.y + d0.y * 22 };
+        lpts[0] = back;
+        diamond = s('polygon', {
+          class: 'uml-head-dia',
+          points: `${a0.x},${a0.y} ${mid.x + n0.x * 7},${mid.y + n0.y * 7} ${back.x},${back.y} ${mid.x - n0.x * 7},${mid.y - n0.y * 7}`,
+        });
+      }
       const path = s('path', { class: 'uml-line' + (dashed ? ' is-dashed' : ''), d: roundedPath(lpts, 10) });
-      const g = s('g', { class: `uml-edge type-${type}${r.ghost ? ' is-ghost' : ''}${r.tone ? ' tone-' + r.tone : ''}`, 'data-id': r.id }, path, head);
+      const g = s('g', { class: `uml-edge type-${type}${r.ghost ? ' is-ghost' : ''}${r.tone ? ' tone-' + r.tone : ''}`, 'data-id': r.id }, path, head, diamond);
 
       let labelEl = null;
       if (r.label) {

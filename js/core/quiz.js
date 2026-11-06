@@ -13,6 +13,23 @@
     return h('div', { class: 'quiz-explain', hidden: true, 'aria-live': 'polite' });
   }
 
+  /**
+   * Şıklar aynı yazı biçiminde olmalı: kalın/italik/vurgu yok, sınıf adları düz yazı (rol rengi ve kalınlık yok);
+   * satır içi kod yalnızca bazı şıklardaysa hiçbirinde yok. (Biçim farkı doğru cevabı ele vermesin.)
+   */
+  function sadeSiklar(options) {
+    const sade = options.map((t) =>
+      t
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/::([^:]+)::/g, '$1')
+        .replace(/\[\[([^\]]+)\]\]/g, '$1')
+        .replace(/(^|[^*\w])\*([^*\n]+)\*(?![*\w])/g, '$1$2')
+    );
+    const kodlu = sade.filter((t) => t.includes('`')).length;
+    return kodlu > 0 && kodlu < sade.length ? sade.map((t) => t.replace(/`/g, '')) : sade;
+  }
+  DP.ui.sadeSiklar = sadeSiklar;
+
   // ------------------------------------------------------------------ çoktan seçmeli
   DP.ui.MCQ = function (root, q, o) {
     o = o || {};
@@ -33,12 +50,13 @@
     }
     const opts = h('div', { class: 'quiz-opts' });
     const explain = explainBox();
-    q.options.forEach((txt, i) => {
+    sadeSiklar(q.options).forEach((txt, i) => {
+      // rol rengi yok: sınıf adının rengi cevabı ele vermesin
       const b = h(
         'button',
         { class: 'quiz-opt', type: 'button' },
         h('span', { class: 'quiz-letter' }, LETTERS[i]),
-        h('span', { class: 'quiz-text', html: DP.md(txt, roleOf) })
+        h('span', { class: 'quiz-text', html: DP.md(txt, null) })
       );
       b.addEventListener('click', () => reveal(i));
       opts.appendChild(b);

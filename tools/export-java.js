@@ -16,7 +16,7 @@ const OUT = path.join(ROOT, 'java');
 // data.js dosyaları tarayıcı için yazıldı; sahte bir `window` ile yükleyelim.
 const sandbox = { window: { DP: {} } };
 vm.createContext(sandbox);
-['factory-method', 'abstract-factory', 'singleton', 'builder', 'prototype', 'adapter'].forEach((p) => {
+['factory-method', 'abstract-factory', 'singleton', 'builder', 'prototype', 'adapter', 'bridge', 'composite', 'decorator', 'facade', 'flyweight', 'proxy', 'chain-of-responsibility', 'command', 'mediator', 'memento', 'observer', 'state', 'strategy'].forEach((p) => {
   vm.runInContext(fs.readFileSync(path.join(ROOT, `js/patterns/${p}/data.js`), 'utf8'), sandbox);
 });
 const DP = sandbox.window.DP;
@@ -213,6 +213,358 @@ function write(pkg, name, code, source) {
   write(gen, 'EuroCargoClient', AD.euro.client, src);
   write(gen, 'EuroCargoAdaptoru', AD.euro.adaptor, src);
   write(gen, 'Main', AD.euro.Main, src);
+})();
+
+// ================================================================== Bridge
+(function () {
+  const BR = DP.br;
+  const src = 'js/patterns/bridge/data.js';
+  const C = BR.code;
+  const base = ['Gonderi', 'Yazici', 'ZebraYazici', 'PdfYazici', 'TermalYazici', 'Etiket', 'KirilacakEtiket', 'IadeEtiketi'];
+
+  // Kalıpsız sürüm 3.1 ("Sorun" sahnesi): her (etiket × yazıcı) eşleşmesi bir sınıf — ^CI28 bir sınıfta unutuldu
+  const naive = BR.naive('v4');
+  Object.keys(naive).forEach((name) => write('bridge.sorun', name, naive[name], src));
+
+  // Kalıplı çözüm: Etiket (soyutlama) ↔ Yazici (gerçekleştirici) köprüsü
+  base.forEach((name) => write('bridge.cozum', name, C[name], src));
+  write('bridge.cozum', 'Main', C.Main, src);
+
+  // Canlı Akış'taki iki eşleşme
+  BR.presetOrder.forEach((k) => BR.akisFiles(BR.presets[k]).forEach((f) => write('bridge.akis.' + k.toLowerCase(), f.name.replace('.java', ''), f.code, src)));
+
+  // Eşleştirme tezgâhı: aynı etiket başka yazıcıda, aynı yazıcı başka etikette, çalışma anında yazıcı değiştirme
+  base.forEach((name) => write('bridge.tezgah', name, C[name], src));
+  write('bridge.tezgah', 'Main', C.TezgahMain, src);
+
+  // Genişlet: yeni gerçekleştirici HtmlYazici, etiket sınıflarına dokunmadan
+  base.concat('HtmlYazici').forEach((name) => write('bridge.genislet', name, C[name], src));
+  write('bridge.genislet', 'Main', BR.ext.Main, src);
+})();
+
+// ================================================================== Composite
+(function () {
+  const CP = DP.cp;
+  const src = 'js/patterns/composite/data.js';
+  const C = CP.code;
+  const base = ['Parca', 'Urun', 'Koli'];
+
+  // Kalıpsız sürüm 3.1 ("Sorun" sahnesi): iki listeli koli, iç içe döngüler — saat kutusu sayılmıyor (3100 g)
+  const naive = CP.naive('v4');
+  Object.keys(naive).forEach((name) => write('composite.sorun', name, naive[name], src));
+
+  // Kalıplı çözüm: ürün de koli de Parca; koli içindekilere sorar (özyineleme)
+  base.forEach((name) => write('composite.cozum', name, C[name], src));
+  write('composite.cozum', 'Main', C.Main, src);
+
+  // Canlı Akış'taki iki tarif: agirlik (son sıra) · listele (ön sıra)
+  CP.presetOrder.forEach((k) => CP.akisFiles(CP.presets[k]).forEach((f) => write('composite.akis.' + k.toLowerCase(), f.name.replace('.java', ''), f.code, src)));
+
+  // Paketleme tezgâhı: yeni dal (hediye kutusu, balonlu poşet) — Koli ve Urun değişmeden
+  base.forEach((name) => write('composite.tezgah', name, C[name], src));
+  write('composite.tezgah', 'Main', C.TezgahMain, src);
+
+  // Şeffaf tasarım: ekle() Parca'da; ürünün içine ekleme çalışma anında istisna (bilerek çöker)
+  write('composite.seffaf', 'Parca', C.ParcaSeffaf, src);
+  write('composite.seffaf', 'Urun', C.Urun, src);
+  write('composite.seffaf', 'Koli', C.KoliSeffaf, src);
+  write('composite.seffaf', 'Main', CP.mainFor(CP.TEZGAH_DAL, { mode: 'seffaf', action: 'ikisi', bad: CP.TEZGAH_BAD }), src);
+
+  // Genişlet: yeni bileşik Palet, hiçbir sınıfa dokunmadan
+  base.concat('Palet').forEach((name) => write('composite.genislet', name, C[name], src));
+  write('composite.genislet', 'Main', CP.ext.Main, src);
+})();
+
+// ================================================================== Decorator
+(function () {
+  const DC = DP.dc;
+  const src = 'js/patterns/decorator/data.js';
+  const C = DC.code;
+  const base = ['KargoHizmeti', 'StandartKargo', 'ZarfKargo', 'EkHizmet', 'Ekspres', 'Sigorta', 'SogukZincir', 'SmsBildirim', 'KurumsalIndirim'];
+
+  // Kalıpsız sürüm 3.1 ("Sorun" sahnesi): her kombinasyon bir alt sınıf — zamda bir sınıf unutuldu (180 TL)
+  const naive = DC.naive('v4');
+  Object.keys(naive).forEach((name) => write('decorator.sorun', name, naive[name], src));
+
+  // Kalıplı çözüm: ek hizmetler çekirdeği saran katmanlar
+  base.forEach((name) => write('decorator.cozum', name, C[name], src));
+  write('decorator.cozum', 'Main', C.Main, src);
+
+  // Canlı Akış'taki iki tarif
+  DC.presetOrder.forEach((k) => DC.akisFiles(DC.presets[k]).forEach((f) => write('decorator.akis.' + k.toLowerCase(), f.name.replace('.java', ''), f.code, src)));
+
+  // Sipariş tezgâhı: katman sırası (112 ≠ 120) ve aynı katman iki kez
+  base.forEach((name) => write('decorator.tezgah', name, C[name], src));
+  write('decorator.tezgah', 'Main', DC.tezgahDemo, src);
+
+  // Genişlet: yeni katman HediyePaketi, hiçbir sınıfa dokunmadan
+  base.concat('HediyePaketi').forEach((name) => write('decorator.genislet', name, C[name], src));
+  write('decorator.genislet', 'Main', DC.ext.Main, src);
+})();
+
+// ================================================================== Facade
+(function () {
+  const FC = DP.fc;
+  const src = 'js/patterns/facade/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.1 ("Sorun" sahnesi): iş akışı istemcilerde — web sitesinde kart limiti unutuldu, hayalet gönderi
+  put('facade.sorun', FC.naiveFiles('v3'));
+
+  // Facade ile çözüm: GonderiCephesi iş akışını ve kuralları toplar; istemciler tek çağrı yapar
+  put('facade.cozum', FC.filesFor(FC.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  FC.presetOrder.forEach((k) => FC.akisFiles(FC.presets[k]).forEach((f) => write('facade.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Cephe tezgâhı: üç istemci, üç değişiklik isteği (kart limiti, sigorta, kurye API'si) — kalıpsız ve cepheli
+  [
+    ['kalipsiz', 'naive'],
+    ['cepheli', 'cephe'],
+  ].forEach(([pkg, design]) => put('facade.tezgah.' + pkg, FC.tezgahFiles({ design, n: 3, limit: true, sigorta: true, kurye: true })));
+
+  // Genişlet: yeni istemci KurumsalApi, alt sistemlerin hiçbirini tanımadan
+  put('facade.genislet', FC.filesFor(FC.ext.prog));
+})();
+
+// ================================================================== Flyweight
+(function () {
+  const FL = DP.fl;
+  const src = 'js/patterns/flyweight/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): her nokta kendi ikonunu yükler — kurye tabletinde (-Xmx64m) OutOfMemoryError
+  put('flyweight.sorun', FL.naiveFiles('v2'));
+
+  // Kestirme sürüm 2.1: bütün nokta türe göre paylaşılır — bellek düzelir, harita yanlış çizilir
+  put('flyweight.kestirme', FL.naiveFiles('v3'));
+
+  // Flyweight ile çözüm: IsaretTuru (paylaşılan, değişmez), IsaretFabrikasi (havuz), HaritaNoktasi (dışsal durum)
+  put('flyweight.cozum', FL.filesFor('flyweight', FL.COZUM));
+
+  // Canlı Akış'taki üç gönderi
+  FL.akisFiles(FL.presets.uc).forEach((f) => write('flyweight.akis', f.name.replace('.java', ''), f.code, src));
+
+  // Genişlet: paylaşılmayan DepoIsareti, hiçbir sınıfa dokunmadan (Canlı Akış'taki "Depolu harita" tarifi)
+  put('flyweight.genislet', FL.filesFor('flyweight', FL.ext.prog));
+})();
+
+// ================================================================== Proxy
+(function () {
+  const PX = DP.px;
+  const src = 'js/patterns/proxy/data.js';
+  const C = PX.code;
+  const base = ['TakipServisi', 'GlobalShipTakip', 'TakipVekili', 'Musteri'];
+
+  // Kalıpsız sürüm 3.1 ("Sorun" sahnesi): denetim istemcilerin içinde — mobilde KVKK unutuldu, Ali'nin adresi sızar
+  const naive = PX.naive('v4');
+  Object.keys(naive).forEach((name) => write('proxy.sorun', name, naive[name], src));
+
+  // Kalıplı çözüm: TakipVekili araya girer (koruma, önbellek, sanal); istemcilerde tek satır denetim yok
+  base.concat(['MusteriPaneli', 'MobilUygulama']).forEach((name) => write('proxy.cozum', name, C[name], src));
+  write('proxy.cozum', 'Main', C.Main, src);
+
+  // Canlı Akış'taki iki tarif
+  PX.presetOrder.forEach((k) => PX.akisFiles(PX.presets[k]).forEach((f) => write('proxy.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Vekil tezgâhı: aynı meraklı müşteri trafiği — vekilsiz (iki sızıntı) ve tam vekilli
+  [
+    ['vekilsiz', PX.TZ_VEKILSIZ],
+    ['vekilli', PX.TZ_VEKILLI],
+  ].forEach(([pkg, cfg]) => {
+    const F = PX.tezgahFiles(cfg);
+    Object.keys(F).forEach((name) => write('proxy.tezgah.' + pkg, name, F[name], src));
+  });
+
+  // Genişlet: yeni istemci SmsBildirim, sıfır denetim kodu
+  base.concat('SmsBildirim').forEach((name) => write('proxy.genislet', name, C[name], src));
+  write('proxy.genislet', 'Main', PX.ext.Main, src);
+})();
+
+// ================================================================== Chain of Responsibility
+(function () {
+  const CR = DP.cr;
+  const src = 'js/patterns/chain-of-responsibility/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.1 ("Sorun" sahnesi): kararlar kuryelerin if/else merdiveninde — İstanbul kopyasında ilaç dolaba girer
+  put('chainofresponsibility.sorun', CR.naiveFiles('v3'));
+
+  // Chain of Responsibility ile çözüm: TeslimatAdimi halkaları; Main aynı sınıflarla Malatya ve İstanbul zincirini kurar
+  put('chainofresponsibility.cozum', CR.filesFor(CR.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  CR.presetOrder.forEach((k) => CR.akisFiles(CR.presets[k]).forEach((f) => write('chainofresponsibility.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Zincir tezgâhı: aynı halkalar, üç zincir — dolap önce, şube önce (sıra = öncelik), iadesiz (KAYIP)
+  [
+    ['dolaponce', CR.ISTANBUL],
+    ['subeonce', CR.SUBE_ONCE],
+    ['iadesiz', CR.IADESIZ],
+  ].forEach(([pkg, keys]) => put('chainofresponsibility.tezgah.' + pkg, CR.tezgahFiles(keys)));
+
+  // Genişlet: yeni halka MarketeTeslim; kurye ve öbür halkalar değişmeden
+  put('chainofresponsibility.genislet', CR.filesFor(CR.ext.prog));
+})();
+
+// ================================================================== Command
+(function () {
+  const CM = DP.cmd;
+  const src = 'js/patterns/command/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.1 ("Sorun" sahnesi): dizgi + switch; ikinci "geri al" boşa gider, gece 02:00'de "YÜKLE" yüzünden çöker
+  put('command.sorun', CM.naiveFiles('v3'));
+
+  // Command ile çözüm: TasiKomutu, YukleKomutu; panel geçmiş/ileri yığını, gece işi komut kuyruğu tutar
+  put('command.cozum', CM.filesFor(CM.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  CM.presetOrder.forEach((k) => CM.akisFiles(CM.presets[k]).forEach((f) => write('command.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Komut tezgâhı: aynı oturum (iki hata, iki geri al) — kalıpsız ve komutlu
+  [
+    ['kalipsiz', 'naive'],
+    ['komutlu', 'komut'],
+  ].forEach(([pkg, design]) => put('command.tezgah.' + pkg, CM.tezgahFiles({ design, ops: CM.GUN })));
+
+  // Genişlet: MakroKomut — üç yükleme tek komut, tek "geri al" hepsini ters sırayla geri alır
+  put('command.genislet', CM.filesFor(CM.ext.prog));
+})();
+
+// ================================================================== Mediator
+(function () {
+  const MD = DP.med;
+  const src = 'js/patterns/mediator/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): öğeler birbirini tanıyor; dolap kuralının iki kopyası soğuk zinciri bilmiyor —
+  // önce soğuk zincir, sonra şehir seçilince soğuk zincirli ilaç dolaba gidiyor
+  put('mediator.sorun', MD.naiveFiles('v2b'));
+
+  // Mediator ile çözüm: FormYoneticisi, FormOgesi; kuralların hepsi GonderiFormu.degisti() içinde
+  put('mediator.cozum', MD.filesFor(MD.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  MD.presetOrder.forEach((k) => MD.akisFiles(MD.presets[k]).forEach((f) => write('mediator.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Form tezgâhı: aynı tıklamalar (soğuk zincir, Malatya, 2 kg, Dolap) — dağınık, kopyalı, Mediator
+  [
+    ['daginik', 'v2'],
+    ['kopyali', 'kopyali'],
+    ['mediator', 'mediator'],
+  ].forEach(([pkg, design]) => put('mediator.tezgah.' + pkg, MD.tezgahFiles({ design, ops: MD.TEZGAH_ANA })));
+
+  // Yapı sahnesindeki tuzak: teslimat seçici yöneticinin ayarını yeniden bildirir → StackOverflowError
+  put('mediator.tuzak', MD.filesFor(MD.tuzak('dongu')));
+
+  // Genişlet: SigortaKutusu — yeni öğe; öteki öğeler değişmeden, yalnızca yönetici değişir
+  put('mediator.genislet', MD.filesFor(MD.ext.prog));
+})();
+
+// ================================================================== Memento
+(function () {
+  const MN = DP.mnt;
+  const src = 'js/patterns/memento/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): yedeği defter alıyor (get/set); depoya eklenen kamyon yedeklenmiyor —
+  // geri yüklemeden sonra koliler hem rafta hem kamyonda
+  put('memento.sorun', MN.naiveFiles('v2'));
+
+  // Memento ile çözüm: Depo kendi hatırasını oluşturur (Depo.Hatira, alanları özel), defter yalnızca saklar
+  put('memento.cozum', MN.filesFor(MN.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  MN.presetOrder.forEach((k) => MN.akisFiles(MN.presets[k]).forEach((f) => write('memento.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Yedek tezgâhı: aynı oturum (kaydet, iki yükleme, bir taşıma, geri yükle) — referans, kopya ve hatıra
+  ['referans', 'kopya', 'hatira'].forEach((design) => put('memento.tezgah.' + design, MN.tezgahFiles({ design, ops: MN.TEZGAH_ANA })));
+
+  // Genişlet: DepoGecmisi — her işlemden önce hatıra; geri al / yinele (Depo ve defter değişmeden)
+  put('memento.genislet', MN.filesFor(MN.ext.prog));
+})();
+
+// ================================================================== Observer
+(function () {
+  const OB = DP.obs;
+  const src = 'js/patterns/observer/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): Gonderi ekranları adıyla çağırıyor; teslimEt tableti unutuyor —
+  // panel "Teslim edildi" derken kurye tableti gönderiyi hâlâ rotada gösteriyor
+  put('observer.sorun', OB.naiveFiles('v2'));
+
+  // Observer ile çözüm: GonderiGozlemcisi arayüzü, abone listesi ve tek bildir(); Main abone eder
+  put('observer.cozum', OB.filesFor(OB.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  OB.presetOrder.forEach((k) => OB.akisFiles(OB.presets[k]).forEach((f) => write('observer.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Abonelik tezgâhı: aynı oturum (iki gönderi, Ali SMS'leri kapatır, 1001 teslim edilir) — doğrudan çağrı, sabit liste, Observer
+  ['dogrudan', 'sabit', 'observer'].forEach((design) => put('observer.tezgah.' + design, OB.tezgahFiles({ design, ops: OB.TEZGAH_ANA })));
+
+  // Yapı sahnesindeki tuzak: telefon bildirim sırasında kendini listeden çıkarır → ConcurrentModificationException
+  put('observer.tuzak', OB.filesFor(OB.tuzak('bas')));
+
+  // Genişlet: CagriMerkezi — yeni gözlemci; Gonderi ve öteki ekranlar değişmeden
+  put('observer.genislet', OB.filesFor(OB.ext.prog));
+})();
+
+// ================================================================== State
+(function () {
+  const ST = DP.sta;
+  const src = 'js/patterns/state/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): durum bir dizgi, her metotta if/else — paketKoy'un else dalı KİLİTLİ'yi de
+  // BOŞ sanır: kilitli dolaba Selin'in paketi konur, Ali'nin kodu artık çalışmaz
+  put('state.sorun', ST.naiveFiles('v2'));
+
+  // State ile çözüm: BosDurum, DoluDurum, KilitliDurum; KargoDolabi isteği o anki durum nesnesine devreder
+  put('state.cozum', ST.filesFor(ST.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  ST.presetOrder.forEach((k) => ST.akisFiles(ST.presets[k]).forEach((f) => write('state.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Dolap tezgâhı: aynı oturum (kilit, ikinci paket, görevli, Ali) — kalıpsız ve durum nesneleriyle
+  [
+    ['kalipsiz', 'naive'],
+    ['durumlu', 'durum'],
+  ].forEach(([pkg, design]) => put('state.tezgah.' + pkg, ST.tezgahFiles({ design, ops: ST.SENARYO })));
+
+  // Genişlet: HizmetDisiDurum — yeni durum sınıfı; BosDurum'da yalnızca gorevliAc'ın gövdesi değişir
+  put('state.genislet', ST.filesFor(ST.ext.prog));
+})();
+
+// ================================================================== Strategy
+(function () {
+  const SG = DP.stg;
+  const src = 'js/patterns/strategy/data.js';
+  const put = (pkg, F) => Object.keys(F).forEach((name) => write(pkg, name, F[name], src));
+
+  // Kalıpsız sürüm 2.0 ("Sorun" sahnesi): rota algoritmaları Kurye'nin içinde (String + if/else); SOGUK_ONCE dalı
+  // ortak listeyi yerinde sıralıyor — öğleden sonra randevu sırası 1, 4, 3, 2 oluyor
+  put('strategy.sorun', SG.naiveFiles('v2'));
+
+  // Strategy ile çözüm: RotaStratejisi ve üç strateji; Kurye stratejiye listenin salt okunur görünümünü veriyor
+  put('strategy.cozum', SG.filesFor(SG.COZUM));
+
+  // Canlı Akış'taki iki tarif
+  SG.presetOrder.forEach((k) => SG.akisFiles(SG.presets[k]).forEach((f) => write('strategy.akis.' + k, f.name.replace('.java', ''), f.code, src)));
+
+  // Rota tezgâhı: aynı istekler (soğuk zincir önce, iki teslimat, randevu sırası, dört teslimat) — üç tasarım
+  [
+    ['ifelse', 'v2'],
+    ['kalitim', 'kalitim'],
+    ['strateji', 'strateji'],
+  ].forEach(([pkg, design]) => put('strategy.tezgah.' + pkg, SG.tezgahFiles({ design, ops: SG.TEZGAH_ANA })));
+
+  // Yapı sahnesindeki tuzak: durum tutan PlanliRota iki kuryeye birden verilir → IllegalStateException
+  put('strategy.tuzak', SG.tuzakFiles('paylasim'));
+
+  // Genişlet: AgirOnceRota — yeni strateji; Kurye ve öteki stratejiler değişmeden
+  put('strategy.genislet', SG.filesFor(SG.ext.prog));
 })();
 
 console.log(written.length + ' dosya yazıldı:');

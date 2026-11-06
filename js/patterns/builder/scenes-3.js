@@ -484,7 +484,7 @@ Gonderi vazo = Gonderi.builder()
       title: 'Builder mı, Abstract Factory mi, Factory Method mu?',
       intro: 'Dördü de “nesneyi kim, nasıl oluşturur?” sorusuna cevap verir. Ayırt etmenin anahtarı: **ne zaman** ve **ne** teslim edildiği.',
       extraHtml: `<table class="cmp cmp-3">
-        <thead><tr><th></th><th>Builder</th><th>Abstract Factory</th><th>Factory Method</th><th>Prototype</th></tr></thead>
+        <thead lang="en"><tr><th></th><th>Builder</th><th>Abstract Factory</th><th>Factory Method</th><th>Prototype</th></tr></thead>
         <tbody>
           <tr><td>Ne üretir?</td><td>Tek, <b>karmaşık</b> ürün</td><td>İlişkili ürün <b>ailesi</b></td><td>Tek ürün</td><td>Var olanın kopyası</td></tr>
           <tr><td>Ne zaman döner?</td><td><b>En sonda</b> (<code>build()</code>)</td><td>Hemen (her çağrıda)</td><td>Hemen</td><td>Hemen (<code>kopyala()</code>)</td></tr>
@@ -536,14 +536,14 @@ Gonderi vazo = new Gonderi.Builder()
     {
       type: 'mcq',
       q: 'Builder kalıbının **temel amacı** (GoF) nedir?',
-      options: ['Bir sınıfın tek örneği olmasını sağlamak', 'İlişkili nesne ailelerini birlikte oluşturmak', 'Karmaşık bir nesnenin **kurulumunu temsilinden ayırmak**; aynı süreçle farklı temsiller üretmek', 'Var olan bir nesneyi kopyalamak'],
+      options: ['Bir sınıfın tek örneği olmasını sağlamak ve ona genel bir erişim noktası vermek', 'Birbiriyle ilişkili nesne ailelerini, somut sınıflarını belirtmeden oluşturmak', 'Karmaşık bir nesnenin kurulumunu temsilinden ayırmak; aynı süreçle farklı temsiller üretmek', 'Var olan bir örneği kopyalayarak, türünü belirtmeden yeni nesneler üretmek'],
       answer: 2,
       explain: 'GoF: “Karmaşık bir nesnenin oluşturulmasını temsilinden ayır; böylece aynı oluşturma süreci farklı temsiller üretebilsin.” Diğerleri Singleton, Abstract Factory ve Prototype’ın amaçlarıdır.',
     },
     {
       type: 'mcq',
       q: '`new Gonderi("Kütahya", "İzmir", 12, false, true, false, 5000)` çağrısının **asıl tehlikesi** nedir?',
-      options: ['Java yedi argümandan fazlasını kabul etmez', 'Çok yavaş çalışır', 'Kurucunun static olması gerekir', 'Aynı tipteki argümanların **yeri karışınca derleyici yakalayamaz**'],
+      options: ['Java, bir kurucuda yediden fazla argümana izin vermez; kod derlenmez', 'Çok argümanlı kurucular her çağrıda yavaş çalışır; nesne geç oluşur', 'Kurucunun static olması gerekir; yoksa argümanlar sırayla atanmaz', 'Aynı tipteki argümanların yeri karışınca derleyici yakalayamaz'],
       answer: 3,
       explain: 'Üç `boolean` yan yana: `kirilgan` ile `sogukZincir`’in yeri karıştı ama tipler aynı olduğu için kod derlendi. Builder’da her değerin bir **adı** var: `.kirilgan()`.',
     },
@@ -558,14 +558,14 @@ Gonderi vazo = new Gonderi.Builder()
     {
       type: 'mcq',
       q: 'Set metotlarına (JavaBeans) göre Builder’ın **en önemli kazancı** hangisi?',
-      options: ['Daha az kod yazılması', 'Kalıtımı zorunlu kılması', 'Daha hızlı çalışması', 'Nesnenin **yarım** hâlde kullanılamaması: `build()` tek seferde doğrular ve **değişmez** nesne verir'],
+      options: ['Daha az kod yazılması: setter’ların hiçbirine gerek kalmaz, sınıf kısalır', 'Kalıtımı zorunlu kılması: her yeni gönderi türü Builder’dan türemek zorundadır', 'Daha hızlı çalışması: alanlar tek tek değil, bir dizi olarak birlikte atanır', 'Nesnenin yarım hâlde kullanılamaması: build() tek seferde doğrular ve değişmez nesne verir'],
       answer: 3,
       explain: 'JavaBeans’te nesne boş doğar, set çağrıları arasında tutarsız kalır ve `final` olamaz. Builder’da tüm kurallar `build()` anında denetlenir; ürünün alanları `final`’dır.',
     },
     {
       type: 'mcq',
       q: 'GoF Builder’da **Yönetici (Director)** neyi bilir?',
-      options: ['Adımların **sırasını** (tarifi) — hangi temsilin üretildiğini bilmez', 'Ürünün hangi somut sınıftan olacağını', 'Ürünün parçalarını kendisi `new` ile oluşturmayı', 'Ürünü değişmez yapmayı'],
+      options: ['Adımların sırasını (tarifi) — hangi temsilin üretildiğini bilmez', 'Ürünün hangi somut sınıftan olacağını — adımların sırasını bilmez', 'Ürünün parçalarını kendisi new ile oluşturmayı ve birleştirmeyi', 'Ürünü değişmez yapmayı — build() çağrısından sonra kilitlemeyi'],
       answer: 0,
       explain: '[[GonderiYoneticisi]] yalnızca `GonderiHazirlayici` arayüzünü tanır ve adımları sırayla çağırır. Paket mi, etiket mi, fiyat mı üretildiğine **verilen hazırlayıcı** karar verir.',
     },
@@ -580,14 +580,14 @@ Gonderi vazo = new Gonderi.Builder()
     {
       type: 'mcq',
       q: '`build()` (GoF: getResult) neden `GonderiHazirlayici` arayüzünde **yer almaz**?',
-      options: ['Java arayüzlerinde metot dönüş tipi olamaz', 'Ürünlerin (`Gonderi`, `String`, `int`) **ortak bir üst tipi yok**', '`build()` yalnızca bir kez çağrılabilir', 'Yönetici onu çağıramadığı için'],
+      options: ['Java arayüzlerindeki metotların dönüş tipi olamaz; void olmalı', 'Ürünlerin (Gonderi, String, int) ortak bir üst tipi yok', 'build() yalnızca bir kez çağrılabilir; bu yüzden arayüze konamaz', 'Yönetici onu çağıramaz; arayüzdeki her metodu yönetici çağırır'],
       answer: 1,
       explain: 'Her hazırlayıcının ürünü bambaşka bir tip; GoF bu yüzden sonuç alma işlemini somut hazırlayıcıya bırakır. İstemci sonucu, oluşturduğu hazırlayıcıdan alır.',
     },
     {
       type: 'mcq',
       q: 'Builder ile Abstract Factory arasındaki **temel fark** nedir?',
-      options: ['İkisi de ürünü hemen döndürür', 'Builder **tek, karmaşık** bir ürünü adım adım kurup **en sonda** verir; Abstract Factory ilişkili bir **aileyi** her çağrıda **hemen** verir', 'Abstract Factory yalnızca tek ürün üretir', 'Builder kalıtım, Abstract Factory kompozisyon kullanır'],
+      options: ['İkisi de ürünü her çağrıda hemen döndürür; fark yalnızca ürünlerin sayısındadır', 'Builder tek, karmaşık ürünü adım adım kurup sonda verir; AF ilişkili aileyi her çağrıda hemen verir', 'AF tek bir ürünü adım adım kurar; Builder ise ilişkili ürün ailelerini birlikte verir', 'Builder kalıtımla, AF kompozisyonla çalışır; ikisi de ürünü sonda tek seferde verir'],
       answer: 1,
       explain: 'Abstract Factory: `aracOlustur()` hemen bir Kamyon döndürür. Builder: `.kirilgan().sigorta(5000)` yalnızca bilgi toplar; ürün `build()`’de doğar.',
     },

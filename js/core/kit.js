@@ -99,6 +99,7 @@
       <span><svg viewBox="0 0 46 14"><line x1="2" y1="7" x2="32" y2="7" class="lg-line"/><polygon points="44,7 32,1.5 32,12.5" class="lg-tri"/></svg> kalıtım (extends)</span>
       <span><svg viewBox="0 0 46 14"><line x1="2" y1="7" x2="32" y2="7" class="lg-line is-dashed"/><polygon points="44,7 32,1.5 32,12.5" class="lg-tri"/></svg> gerçekleme (implements)</span>
       ${o.association ? '<span><svg viewBox="0 0 46 14"><line x1="2" y1="7" x2="42" y2="7" class="lg-line"/><polyline points="33,1.5 43,7 33,12.5" class="lg-open"/></svg> ilişki (alan)</span>' : ''}
+      ${o.aggregation ? '<span><svg viewBox="0 0 46 14"><polygon points="2,7 10,2.5 18,7 10,11.5" class="lg-dia"/><line x1="18" y1="7" x2="42" y2="7" class="lg-line"/><polyline points="33,1.5 43,7 33,12.5" class="lg-open"/></svg> toplama (aggregation: ' + (typeof o.aggregation === 'string' ? o.aggregation : 'sarar') + ')</span>' : ''}
       <span><svg viewBox="0 0 46 14"><line x1="2" y1="7" x2="42" y2="7" class="lg-line is-dashed"/><polyline points="33,1.5 43,7 33,12.5" class="lg-open"/></svg> bağımlılık / «create»</span>
       <span><i>italik</i> = soyut</span>
       <span><code>+</code> public · <code>#</code> protected · <code>-</code> private</span>
@@ -159,6 +160,15 @@
       paintAll();
     }
 
+    /** Seçili boşluk alıştırma kutusunun görünen alanı dışındaysa oraya kaydır (ikinci dosyadaki boşluklar) */
+    function reveal(n) {
+      const b = n && blanks[n];
+      if (!b || wrap.scrollHeight <= wrap.clientHeight + 1) return;
+      const wr = wrap.getBoundingClientRect();
+      const br = b.getBoundingClientRect();
+      if (br.top < wr.top || br.bottom > wr.bottom) wrap.scrollTop += br.top - wr.top - wr.height * 0.35;
+    }
+
     ids.forEach((n) => {
       const b = blanks[n];
       if (!b) return;
@@ -188,6 +198,7 @@
         S[n] = value;
         selected = nextEmpty();
         paintAll();
+        reveal(selected);
         DP.flash(blanks[n], 'is-pop');
         if (!nextEmpty() && o.onSolved) o.onSolved();
       } else {

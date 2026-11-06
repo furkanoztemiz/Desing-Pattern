@@ -5,6 +5,8 @@
 (function () {
   'use strict';
   const { h } = DP;
+  // emeği geçen: ana sayfada, kısayollar penceresinde ve yazdırılan özetlerde görünür
+  DP.CREDIT = 'Bu program Doç. Dr. Furkan ÖZTEMİZ tarafından Yazılım Tasarımı ve Mimarisi dersi için geliştirilmiştir.';
 
   const ICON = {
     zoomOut: '<svg viewBox="0 0 24 24"><text x="2" y="17" font-size="13" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">A</text><path d="M14 12h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
@@ -122,7 +124,8 @@
           { class: 'modal-tips' },
           h('b', null, 'Sunum ipuçları: '),
           'Sunum kumandası (clicker) genellikle PgDn/PgUp gönderir; doğrudan çalışır. Projeksiyonda yazılar küçük kalırsa + tuşuyla büyütün, Canlı Akış’ta “Kod paneli”ni gizleyerek sahneyi genişletin.'
-        )
+        ),
+        h('p', { class: 'modal-credit' }, DP.CREDIT)
       )
     );
     helpEl.addEventListener('click', (e) => e.target === helpEl && toggleHelp(false));
@@ -180,6 +183,7 @@
             <button class="btn btn-ghost btn-lg" type="button" data-help>⌨ Klavye kısayolları</button>
           </div>
           <div class="home-stats"><span><b>${readyCount}</b> / ${DP.catalog.length} kalıp hazır</span><span>İnternet gerektirmez</span><span>Java 17+ örnek kodlar</span></div>
+          <p class="home-credit"><span class="home-credit-ic" aria-hidden="true">🎓</span>${DP.esc(DP.CREDIT)}</p>
         </div>
         <div class="home-hero-art" aria-hidden="true">${heroArt()}</div>
       </section>
